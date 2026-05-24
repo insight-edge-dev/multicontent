@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { CategoryTabs } from "@/components/CategoryTabs";
 import { Container } from "@/components/Container";
 import type { Bookmark } from "@/lib/bookmarkTypes";
+import { SUPPORTED_CATEGORIES, inferCategoryFromText, type Category } from "@/lib/categoryTypes";
 import { useBookmarks } from "@/hooks/useBookmarks";
 
 type TokenPayload = {
@@ -15,9 +17,15 @@ type TokenPayload = {
 
 const sidebarItems = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/settings", label: "Settings" },
   { href: "/news", label: "News" },
   { href: "/videos", label: "Videos" },
 ];
+
+type SavedCategory = Category | "All";
+type SavedSort = "newest" | "oldest" | "title" | "source";
+
+const savedCategories: readonly SavedCategory[] = ["All", ...SUPPORTED_CATEGORIES];
 
 function decodeToken(token: string): TokenPayload | null {
   try {
@@ -63,6 +71,46 @@ function getBookmarkHref(bookmark: Bookmark) {
   }
 
   return "#";
+}
+
+function getBookmarkCategory(bookmark: Bookmark) {
+  return inferCategoryFromText(bookmark.title, bookmark.source);
+}
+
+function filterAndSortBookmarks(
+  bookmarks: Bookmark[],
+  query: string,
+  category: SavedCategory,
+  sort: SavedSort,
+) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  return bookmarks
+    .filter((bookmark) => {
+      const bookmarkCategory = getBookmarkCategory(bookmark);
+      const matchesCategory = category === "All" || bookmarkCategory === category;
+      const matchesQuery =
+        !normalizedQuery ||
+        [bookmark.title, bookmark.source, bookmarkCategory]
+          .filter(Boolean)
+          .some((value) => value?.toLowerCase().includes(normalizedQuery));
+
+      return matchesCategory && matchesQuery;
+    })
+    .sort((a, b) => {
+      if (sort === "title") {
+        return (a.title ?? "").localeCompare(b.title ?? "");
+      }
+
+      if (sort === "source") {
+        return (a.source ?? "").localeCompare(b.source ?? "");
+      }
+
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+
+      return sort === "oldest" ? aTime - bTime : bTime - aTime;
+    });
 }
 
 function SavedItemCard({ bookmark }: { bookmark: Bookmark }) {
@@ -160,9 +208,16 @@ export default function DashboardPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [savedQuery, setSavedQuery] = useState("");
+  const [savedCategory, setSavedCategory] = useState<SavedCategory>("All");
+  const [savedSort, setSavedSort] = useState<SavedSort>("newest");
   const { bookmarks, isLoading: isLoadingBookmarks, error: bookmarkError } = useBookmarks();
-  const savedArticles = bookmarks.filter((bookmark) => bookmark.type === "article");
-  const savedVideos = bookmarks.filter((bookmark) => bookmark.type === "video");
+  const visibleBookmarks = useMemo(
+    () => filterAndSortBookmarks(bookmarks, savedQuery, savedCategory, savedSort),
+    [bookmarks, savedCategory, savedQuery, savedSort],
+  );
+  const savedArticles = visibleBookmarks.filter((bookmark) => bookmark.type === "article");
+  const savedVideos = visibleBookmarks.filter((bookmark) => bookmark.type === "video");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -262,6 +317,49 @@ export default function DashboardPage() {
               {bookmarkError}
             </div>
           ) : null}
+
+          <section
+            id="saved"
+            className="rounded-lg border border-white/10 bg-white/[0.04] p-5 shadow-glow sm:p-6"
+          >
+            <div className="grid gap-4 lg:grid-cols-[1fr_180px] lg:items-end">
+              <label className="block">
+                <span className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                  Saved Search
+                </span>
+                <input
+                  type="search"
+                  value={savedQuery}
+                  onChange={(event) => setSavedQuery(event.target.value)}
+                  placeholder="Filter saved titles and sources"
+                  className="mt-3 h-11 w-full rounded-lg border border-white/10 bg-slate-950/70 px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                  Sort
+                </span>
+                <select
+                  value={savedSort}
+                  onChange={(event) => setSavedSort(event.target.value as SavedSort)}
+                  className="mt-3 h-11 w-full rounded-lg border border-white/10 bg-slate-950/70 px-3 text-sm text-white outline-none transition focus:border-cyan-300/60"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="title">Title</option>
+                  <option value="source">Source</option>
+                </select>
+              </label>
+            </div>
+
+            <CategoryTabs
+              categories={savedCategories}
+              activeCategory={savedCategory}
+              onCategoryChange={setSavedCategory}
+              className="mt-5"
+            />
+          </section>
 
           <SavedSection
             title="Saved Articles"

@@ -74,7 +74,7 @@ export function BookmarkButton({ bookmark, className = "" }: BookmarkButtonProps
         void handleClick();
       }}
       disabled={isMutating}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-slate-950/80 text-cyan-200 shadow-glow backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-slate-950 disabled:cursor-wait disabled:opacity-80 ${className}`}
+      className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-slate-950/82 text-cyan-200 shadow-[0_0_34px_rgba(34,211,238,0.16)] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-slate-950 disabled:cursor-wait disabled:opacity-80 ${className}`}
     >
       {isMutating ? <Spinner /> : <BookmarkIcon filled={isSaved} />}
     </button>

@@ -42,7 +42,7 @@ export function NewsCard({ article }: NewsCardProps) {
   const shouldShowImage = isRenderableImageSrc(imageSrc) && !hasImageError;
 
   return (
-    <article className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.04] shadow-glow transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/[0.06]">
+    <article className="cinematic-hover group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] shadow-[0_18px_70px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.05)] hover:border-cyan-300/40 hover:bg-white/[0.07]">
       <BookmarkButton
         bookmark={{
           type: "article",
@@ -64,16 +64,17 @@ export function NewsCard({ article }: NewsCardProps) {
               alt=""
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100"
+              className="object-cover opacity-90 transition duration-700 group-hover:scale-[1.055] group-hover:opacity-100"
               onError={() => setHasImageError(true)}
             />
           ) : (
-            <div className="grid h-full place-items-center bg-gradient-to-br from-slate-900 to-slate-800 text-sm text-slate-500">
+            <div className="grid h-full place-items-center bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#020617,#0f172a)] text-sm text-slate-500">
               No image
             </div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-950/75 via-transparent to-white/5" />
         </div>
-        <div className="space-y-3 p-5">
+        <div className="space-y-3.5 p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
             {sourceName ? (
               <span className="rounded-md border border-cyan-300/25 bg-cyan-300/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-200">
@@ -89,7 +90,7 @@ export function NewsCard({ article }: NewsCardProps) {
           <time className="block text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">
             {publishedAt}
           </time>
-          <h2 className="line-clamp-2 text-lg font-semibold leading-6 text-white">
+          <h2 className="line-clamp-2 text-xl font-semibold leading-7 text-white">
             {article.title}
           </h2>
           <p className="line-clamp-3 text-sm leading-6 text-slate-300">

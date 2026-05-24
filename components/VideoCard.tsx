@@ -22,7 +22,7 @@ export function VideoCard({ video }: VideoCardProps) {
   }).format(new Date(video.publishedAt));
 
   return (
-    <article className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.04] shadow-glow transition hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/[0.06]">
+    <article className="cinematic-hover group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] shadow-[0_18px_70px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.05)] hover:border-cyan-300/40 hover:bg-white/[0.07]">
       <BookmarkButton
         bookmark={{
           type: "video",
@@ -40,21 +40,21 @@ export function VideoCard({ video }: VideoCardProps) {
             alt=""
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100"
+            className="object-cover opacity-90 transition duration-700 group-hover:scale-[1.055] group-hover:opacity-100"
           />
-          <div className="absolute inset-0 grid place-items-center bg-black/20">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-sm font-black text-ink-950 shadow-xl transition group-hover:scale-110">
+          <div className="absolute inset-0 grid place-items-center bg-gradient-to-t from-ink-950/70 via-black/15 to-white/5">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-sm font-black text-ink-950 shadow-xl transition duration-300 group-hover:scale-110">
               ▶
             </span>
           </div>
         </div>
-        <div className="space-y-3 p-5">
+        <div className="space-y-3.5 p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-cyan-300">
             <span>{video.channel}</span>
             <span className="text-slate-600">/</span>
             <time>{publishedAt}</time>
           </div>
-          <h2 className="line-clamp-2 text-lg font-semibold leading-6 text-white">
+          <h2 className="line-clamp-2 text-xl font-semibold leading-7 text-white">
             {video.title}
           </h2>
           <p className="line-clamp-3 text-sm leading-6 text-slate-300">

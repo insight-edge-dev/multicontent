@@ -22,3 +22,4 @@ yarn-error.log*
 
 # prisma
 prisma/migrations/
+figma/

@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { CategoryTabs } from "@/components/CategoryTabs";
+import type { Category } from "@/lib/categoryTypes";
 import { NewsCard } from "@/components/NewsCard";
 import type { NewsArticle, NewsResponse } from "@/lib/newsTypes";
 import { limitNewsArticles } from "@/lib/newsUtils";
 
-const categories = ["Technology", "AI", "Gaming", "Startups", "Cybersecurity"] as const;
-
-type NewsCategory = (typeof categories)[number];
-
 type CategoryNewsFeedProps = {
   initialArticles: NewsArticle[];
-  initialCategory?: NewsCategory;
+  initialCategory?: Category;
   className?: string;
   limit?: number;
 };
 
-async function fetchCategoryNews(category: NewsCategory) {
+async function fetchCategoryNews(category: Category) {
   const response = await fetch(`/api/aggregate/news?q=${encodeURIComponent(category)}`, {
     cache: "no-store",
   });
@@ -35,12 +33,12 @@ export function CategoryNewsFeed({
   className = "mt-10",
   limit,
 }: CategoryNewsFeedProps) {
-  const [activeCategory, setActiveCategory] = useState<NewsCategory>(initialCategory);
+  const [activeCategory, setActiveCategory] = useState<Category>(initialCategory);
   const [articles, setArticles] = useState(() => limitNewsArticles(initialArticles, limit));
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function handleCategoryChange(category: NewsCategory) {
+  async function handleCategoryChange(category: Category) {
     if (category === activeCategory || isLoading) {
       return;
     }
@@ -61,30 +59,11 @@ export function CategoryNewsFeed({
 
   return (
     <section className={className}>
-      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="flex min-w-max gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-1 sm:inline-flex">
-          {categories.map((category) => {
-            const isActive = category === activeCategory;
-
-            return (
-              <button
-                key={category}
-                type="button"
-                aria-pressed={isActive}
-                disabled={isLoading && !isActive}
-                onClick={() => handleCategoryChange(category)}
-                className={`rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
-                  isActive
-                    ? "bg-cyan-300 text-ink-950 shadow-glow"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <CategoryTabs
+        activeCategory={activeCategory}
+        onCategoryChange={handleCategoryChange}
+        disabled={isLoading}
+      />
 
       <div className="mt-4 min-h-6">
         {isLoading ? (
