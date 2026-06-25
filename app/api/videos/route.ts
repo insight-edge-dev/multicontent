@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cache } from "@/lib/cache";
 
+export const dynamic = "force-dynamic";
+
 const CACHE_TTL = 60;
 
 interface YouTubeItem {

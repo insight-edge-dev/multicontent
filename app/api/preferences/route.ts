@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 import { isCategory } from "@/lib/categoryTypes";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const preferencesSchema = z.object({
   preferredCategories: z.array(z.string()).max(6),
 });
